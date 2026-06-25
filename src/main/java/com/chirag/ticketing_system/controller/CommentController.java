@@ -21,8 +21,8 @@ public class CommentController {
     }
 
     @GetMapping("/ticket/{ticket_id}")
-    public ResponseEntity<?> getAllCommentsByTicket(@PathVariable Integer id){
-        return ResponseEntity.ok().body(commentService.getAllCommentsByTicketId(id));
+    public ResponseEntity<?> getAllCommentsByTicket(@PathVariable Integer ticket_id){
+        return ResponseEntity.ok().body(commentService.getAllCommentsByTicketId(ticket_id));
     }
 
     @DeleteMapping("/delete/{id}")
