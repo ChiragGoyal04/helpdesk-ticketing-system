@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SupportDesk | Ticketing System</title>
+    <!-- Outfit Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="app.css">
+</head>
+<body class="light-theme">
+    
+    <!-- Navbar / Header -->
+    <header class="glass-header">
+        <div class="header-container">
+            <div class="logo">
+                <i class="fa-solid fa-ticket-simple logo-icon"></i>
+                <h1>Support<span>Desk</span></h1>
+            </div>
+            
+            <div class="header-actions">
+                <!-- Acting User Selector -->
+                <div class="user-selector-wrapper">
+                    <label for="acting-user-select"><i class="fa-solid fa-user-circle"></i> Act As:</label>
+                    <select id="acting-user-select" class="form-input select-sm">
+                        <option value="">System Default</option>
+                    </select>
+                </div>
+
+                <!-- Theme Toggle -->
+                <button id="theme-toggle-btn" class="icon-btn" title="Toggle Theme">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        
+        <!-- Dashboard Statistics -->
+        <section class="stats-grid">
+            <div class="stat-card" data-status="OPEN">
+                <div class="stat-info">
+                    <h3>Open</h3>
+                    <p id="stat-open-count">0</p>
+                </div>
+                <div class="stat-icon open-bg"><i class="fa-solid fa-folder-open"></i></div>
+            </div>
+            <div class="stat-card" data-status="IN_PROGRESS">
+                <div class="stat-info">
+                    <h3>In Progress</h3>
+                    <p id="stat-progress-count">0</p>
+                </div>
+                <div class="stat-icon progress-bg"><i class="fa-solid fa-spinner fa-spin-hover"></i></div>
+            </div>
+            <div class="stat-card" data-status="RESOLVED">
+                <div class="stat-info">
+                    <h3>Resolved</h3>
+                    <p id="stat-resolved-count">0</p>
+                </div>
+                <div class="stat-icon resolved-bg"><i class="fa-solid fa-circle-check"></i></div>
+            </div>
+            <div class="stat-card" data-status="CLOSED">
+                <div class="stat-info">
+                    <h3>Closed</h3>
+                    <p id="stat-closed-count">0</p>
+                </div>
+                <div class="stat-icon closed-bg"><i class="fa-solid fa-box-archive"></i></div>
+            </div>
+        </section>
+
+        <!-- Main Workspace -->
+        <div class="workspace-grid">
+            
+            <!-- Left Panel: User Management -->
+            <aside class="panel left-panel">
+                <div class="panel-section">
+                    <h2><i class="fa-solid fa-user-plus"></i> Register User</h2>
+                    <form id="create-user-form" class="app-form">
+                        <div class="form-group">
+                            <label for="user-name">Full Name</label>
+                            <input type="text" id="user-name" required placeholder="John Doe" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="user-email">Email Address</label>
+                            <input type="email" id="user-email" required placeholder="john@example.com" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="user-password">Password</label>
+                            <input type="password" id="user-password" required placeholder="••••••••" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="user-role">System Role</label>
+                            <select id="user-role" required class="form-input">
+                                <option value="USER">User (Customer)</option>
+                                <option value="AGENT">Agent (Support staff)</option>
+                                <option value="ADMIN">Admin (Manager)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fa-solid fa-plus-circle"></i> Create User
+                        </button>
+                    </form>
+                </div>
+
+                <div class="panel-section users-list-section">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-users"></i> Users Directory</h2>
+                        <button id="refresh-users-btn" class="icon-btn-sm" title="Refresh Users"><i class="fa-solid fa-rotate"></i></button>
+                    </div>
+                    <div id="users-container" class="users-list">
+                        <!-- Users dynamically rendered here -->
+                        <div class="loading-state">
+                            <i class="fa-solid fa-circle-notch fa-spin"></i> Loading users...
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Right Panel: Tickets Desk -->
+            <section class="panel main-panel">
+                
+                <!-- Ticket Toolbar (Filters, Search, Actions) -->
+                <div class="toolbar">
+                    <div class="toolbar-search">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="ticket-search" placeholder="Search tickets by title, description..." class="form-input">
+                    </div>
+                    
+                    <div class="toolbar-filters">
+                        <select id="filter-status" class="form-input select-sm">
+                            <option value="">All Statuses</option>
+                            <option value="OPEN">Open</option>
+                            <option value="IN_PROGRESS">In Progress</option>
+                            <option value="RESOLVED">Resolved</option>
+                            <option value="CLOSED">Closed</option>
+                        </select>
+                        
+                        <select id="filter-priority" class="form-input select-sm">
+                            <option value="">All Priorities</option>
+                            <option value="LOW">Low</option>
+                            <option value="MEDIUM">Medium</option>
+                            <option value="HIGH">High</option>
+                            <option value="URGENT">Urgent</option>
+                        </select>
+                        
+                        <button id="open-create-ticket-modal-btn" class="btn btn-primary">
+                            <i class="fa-solid fa-plus"></i> New Ticket
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Ticket Grid -->
+                <div class="ticket-workspace">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-ticket"></i> Active Tickets</h2>
+                        <button id="refresh-tickets-btn" class="icon-btn-sm" title="Refresh Tickets"><i class="fa-solid fa-rotate"></i></button>
+                    </div>
+                    <div id="tickets-container" class="tickets-grid-container">
+                        <!-- Tickets dynamically loaded -->
+                        <div class="loading-state">
+                            <i class="fa-solid fa-circle-notch fa-spin"></i> Scanning and Loading Tickets...
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Create Ticket Modal -->
+    <div id="create-ticket-modal" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-circle-plus"></i> Create Support Ticket</h2>
+                <button class="close-modal-btn">&times;</button>
+            </div>
+            <form id="create-ticket-form" class="app-form">
+                <div class="form-group">
+                    <label for="ticket-title">Ticket Title</label>
+                    <input type="text" id="ticket-title" required placeholder="Brief description of the problem" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="ticket-description">Detailed Description</label>
+                    <textarea id="ticket-description" required rows="4" placeholder="Explain the issue you are facing..." class="form-input"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ticket-priority">Priority</label>
+                        <select id="ticket-priority" required class="form-input">
+                            <option value="LOW">Low</option>
+                            <option value="MEDIUM" selected>Medium</option>
+                            <option value="HIGH">High</option>
+                            <option value="URGENT">Urgent</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ticket-status">Initial Status</label>
+                        <select id="ticket-status" required class="form-input">
+                            <option value="OPEN" selected>Open</option>
+                            <option value="IN_PROGRESS">In Progress</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ticket-creator">Created By (User)</label>
+                        <select id="ticket-creator" required class="form-input">
+                            <option value="">Select Creator...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ticket-agent">Assign Agent</label>
+                        <select id="ticket-agent" required class="form-input">
+                            <option value="">Select Agent...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Ticket Modal -->
+    <div id="edit-ticket-modal" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-edit"></i> Edit Ticket</h2>
+                <button class="close-modal-btn">&times;</button>
+            </div>
+            <form id="edit-ticket-form" class="app-form">
+                <input type="hidden" id="edit-ticket-id">
+                <div class="form-group">
+                    <label for="edit-ticket-title">Ticket Title</label>
+                    <input type="text" id="edit-ticket-title" required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="edit-ticket-description">Detailed Description</label>
+                    <textarea id="edit-ticket-description" required rows="4" class="form-input"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-ticket-priority">Priority</label>
+                        <select id="edit-ticket-priority" required class="form-input">
+                            <option value="LOW">Low</option>
+                            <option value="MEDIUM">Medium</option>
+                            <option value="HIGH">High</option>
+                            <option value="URGENT">Urgent</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-ticket-status">Status</label>
+                        <select id="edit-ticket-status" required class="form-input">
+                            <option value="OPEN">Open</option>
+                            <option value="IN_PROGRESS">In Progress</option>
+                            <option value="RESOLVED">Resolved</option>
+                            <option value="CLOSED">Closed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Ticket Detail Drawer / Slide Panel -->
+    <div id="ticket-drawer" class="drawer-backdrop hidden">
+        <div class="drawer-panel">
+            <div class="drawer-header">
+                <div class="drawer-title-group">
+                    <span id="drawer-ticket-id" class="ticket-id-tag">#ID</span>
+                    <h2 id="drawer-ticket-title">Ticket Title</h2>
+                </div>
+                <button id="close-drawer-btn" class="icon-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="drawer-body">
+                <!-- Info Section -->
+                <div class="drawer-section metadata-section">
+                    <div class="meta-row">
+                        <div class="meta-item">
+                            <span class="meta-label">Status</span>
+                            <span id="drawer-ticket-status" class="status-badge open">OPEN</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Priority</span>
+                            <span id="drawer-ticket-priority" class="priority-badge medium">MEDIUM</span>
+                        </div>
+                    </div>
+                    <div class="meta-row">
+                        <div class="meta-item">
+                            <span class="meta-label">Created By</span>
+                            <span id="drawer-ticket-creator" class="meta-value">John Doe</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Assigned Agent</span>
+                            <span id="drawer-ticket-agent" class="meta-value">Agent Smith</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="drawer-section">
+                    <h3>Description</h3>
+                    <p id="drawer-ticket-desc" class="ticket-desc-text">
+                        Detailed description of the issue.
+                    </p>
+                </div>
+
+                <!-- Update Status & Reassign Agent (Quick Controls) -->
+                <div class="drawer-section quick-controls">
+                    <h3>Manage Ticket</h3>
+                    <div class="controls-row">
+                        <div class="form-group flex-1">
+                            <label for="drawer-status-select">Change Status</label>
+                            <select id="drawer-status-select" class="form-input select-sm">
+                                <option value="OPEN">Open</option>
+                                <option value="IN_PROGRESS">In Progress</option>
+                                <option value="RESOLVED">Resolved</option>
+                                <option value="CLOSED">Closed</option>
+                            </select>
+                        </div>
+                        <div class="form-group flex-1">
+                            <label for="drawer-agent-select">Reassign Agent</label>
+                            <select id="drawer-agent-select" class="form-input select-sm">
+                                <option value="">Unassigned</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comments Section -->
+                <div class="drawer-section comments-section">
+                    <h3><i class="fa-solid fa-comments"></i> Discussion</h3>
+                    
+                    <!-- Comment Input -->
+                    <form id="post-comment-form" class="comment-input-area">
+                        <div class="form-group">
+                            <label for="comment-user-select" style="font-size: 11px; margin-bottom: 2px;">Comment As:</label>
+                            <select id="comment-user-select" class="form-input select-sm" required>
+                                <option value="">Select User...</option>
+                            </select>
+                        </div>
+                        <textarea id="comment-message" required placeholder="Type a comment..." rows="2" class="form-input"></textarea>
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="fa-solid fa-paper-plane"></i> Send
+                        </button>
+                    </form>
+
+                    <!-- Comments List -->
+                    <div id="comments-container" class="comments-list">
+                        <!-- Comments rendered here -->
+                        <div class="no-comments">No comments yet. Be the first to reply!</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="drawer-footer">
+                <button id="drawer-edit-btn" class="btn btn-secondary flex-1"><i class="fa-solid fa-edit"></i> Edit</button>
+                <button id="drawer-delete-btn" class="btn btn-danger flex-1"><i class="fa-solid fa-trash-can"></i> Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden">
+        <i class="fa-solid fa-info-circle toast-icon"></i>
+        <span id="toast-message">Message text here</span>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
